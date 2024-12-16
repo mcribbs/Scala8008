@@ -1,7 +1,4 @@
-package net.mcribbs
-package s8008
-
-import net.mcribbs.Memory
+package net.mcribbs.s8008
 
 case class Memory(data: Array[Byte]) {
   

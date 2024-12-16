@@ -1,48 +1,34 @@
 package net.mcribbs.s8008
 
-/*
- https://retrocomputing.stackexchange.com/questions/15787/intel-8008-stack-behavior
- https://www.baeldung.com/scala/list-finite-size
-*/
+// https://retrocomputing.stackexchange.com/questions/15787/intel-8008-stack-behavior
+class Stack (sp: Int = 0, s: Array[Short] = Array.ofDim[Short](Stack.MAX_SIZE)):
 
-class CircularBufferFixedSizeList[A](val maxSize: Int) extends Iterable[A] {
-  private val buffer = Array.ofDim[Any](maxSize)
-  private var start = 0
-  private var end = 0
-
-  def add(element: A): Unit = {
-    buffer(end) = element
-    end = (end + 1) % maxSize
-
-    if (end == start) {
-      start = (start + 1) % maxSize
-    }
+  def push(address: Short): Stack = {
+    val newStackPointer = (this.sp + 1) % Stack.MAX_SIZE
+    // Again, pretending to be immutable with the mutable Array... Ok????
+    val newStackBuffer = this.s.clone()
+    newStackBuffer(newStackPointer) = address
+    new Stack(newStackPointer, newStackBuffer)
   }
 
-  def get(index: Int): Option[A] = {
-    if (index >= 0 && index < size) {
-      Some(buffer((start + index) % maxSize).asInstanceOf[A])
-    } else {
-      None
-    }
+  def decSP: Stack = {
+    val newStackPointer = (sp + Stack.MAX_SIZE - 1) % Stack.MAX_SIZE
+    new Stack(newStackPointer, this.s)
   }
 
-  override def size: Int = {
-    if (end >= start) end - start
-    else maxSize - start + end
+  def PC: Short = s(sp)
+
+  def incPC: Stack = {
+    val newStackBuffer = this.s.clone()
+    newStackBuffer(sp) = (s(sp) + 1).toShort
+    new Stack(sp, newStackBuffer)
   }
 
-  override def isEmpty: Boolean = start == end
-
-  override def iterator: Iterator[A] = new Iterator[A] {
-    private var pos = start
-
-    override def hasNext: Boolean = pos != end
-
-    override def next(): A = {
-      val elem = buffer(pos).asInstanceOf[A]
-      pos = (pos + 1) % maxSize
-      elem
-    }
+  override def toString:String = {
+    f"PC:$PC%#06x " +
+    s"Stack(" + s.map(n => f"$n%#06x").mkString(", ") + ") " +
+    f"sp:$sp%#04x "
   }
-}
+
+object Stack:
+  val MAX_SIZE = 8

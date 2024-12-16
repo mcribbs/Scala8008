@@ -1,28 +1,34 @@
-package net.mcribbs
-package s8008
+package net.mcribbs.s8008
 
-import net.mcribbs.Registers
-
-case class Registers(A: Byte = 0, B: Byte = 0, C: Byte = 0, D: Byte = 0, E: Byte = 0, H: Byte = 0, L: Byte = 0) {
-
+class Registers(A: Byte = 0, B: Byte = 0, C: Byte = 0, D: Byte = 0, E: Byte = 0, H: Byte = 0, L: Byte = 0):
+  
+  // BLECH!!! TODO do this in a way that doesn't make me vomit
   def withRegister(registerId: Byte, value: Byte): Registers = {
     registerId match {
-      case Registers.ID.A => copy(A = value)
-      case Registers.ID.B => copy(B = value)
-      case Registers.ID.C => copy(C = value)
-      case Registers.ID.D => copy(D = value)
-      case Registers.ID.E => copy(E = value)
-      case Registers.ID.H => copy(H = value)
-      case Registers.ID.L => copy(L = value)
+      case Registers.ID.A => new Registers(value,this.B,this.C,this.D,this.E,this.H,this.L)
+      case Registers.ID.B => new Registers(this.A,value,this.C,this.D,this.E,this.H,this.L)
+      case Registers.ID.C => new Registers(this.A,this.B,value,this.D,this.E,this.H,this.L)
+      case Registers.ID.D => new Registers(this.A,this.B,this.C,value,this.E,this.H,this.L)
+      case Registers.ID.E => new Registers(this.A,this.B,this.C,this.D,value,this.H,this.L)
+      case Registers.ID.H => new Registers(this.A,this.B,this.C,this.D,this.E,value,this.L)
+      case Registers.ID.L => new Registers(this.A,this.B,this.C,this.D,this.E,this.H,value)
     }
   }
 
   def HL: Short = {
     ((H << 8) + L).asInstanceOf[Short]
   }
-}
+  
+  override def toString:String = {
+    f"Registers(A:$A%#04x " +
+    f"B:$B%#04x " +
+    f"C:$C%#04x " +
+    f"D:$D%#04x " +
+    f"E:$E%#04x " +
+    f"HL:$HL%#06x)"
+  }
 
-case object Registers:
+object Registers:
   object ID:
     val A: Byte = 0
     val B: Byte = 1
