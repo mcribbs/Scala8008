@@ -1,6 +1,6 @@
 package net.mcribbs.s8008
 
-case class Memory(data: Array[Byte]) {
+case class Memory(data: Array[Byte] = new Array[Byte](Memory.MAX_MEMORY)) {
   
   //TODO can I enforce at compile time?
   //https://stackoverflow.com/questions/69183363/scala-enforce-length-of-array-collection-parameter
@@ -15,10 +15,13 @@ case class Memory(data: Array[Byte]) {
   def readByte(address: Short): Byte = data(address)
 
   def logBytes(startAddress: Short, length: Int): Unit = {
-    println(f"Start: $startAddress%#06x Bytes: $length")
+    println(f"Memory dump - start address: $startAddress%#06x Bytes: $length")
     for (i <- 0 until length)
       print(f"${data(i)}%02x ")
       if (i+1) % 8 == 0 then println("")
+
+    println()
+    println()
   }
 }
 

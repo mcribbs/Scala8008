@@ -14,6 +14,18 @@ class Registers(A: Byte = 0, B: Byte = 0, C: Byte = 0, D: Byte = 0, E: Byte = 0,
       case Registers.ID.L => new Registers(this.A,this.B,this.C,this.D,this.E,this.H,value)
     }
   }
+  
+  def getRegister(registerId: Byte): Byte = {
+    registerId match {
+      case Registers.ID.A => A
+      case Registers.ID.B => B
+      case Registers.ID.C => C
+      case Registers.ID.D => D
+      case Registers.ID.E => E
+      case Registers.ID.H => H
+      case Registers.ID.L => L
+    }
+  }
 
   def HL: Short = {
     ((H << 8) + L).asInstanceOf[Short]
