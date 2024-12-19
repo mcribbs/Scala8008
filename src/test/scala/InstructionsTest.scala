@@ -29,6 +29,20 @@ class InstructionsTest extends AnyFlatSpec with should.Matchers {
     state.ram.readByte(0x0001) should be (0x42)
   }
 
+  "INr" should "increment the contents of register r" in {
+    val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x08)
+    val cpu = new CPU(ram)
+    val state = cpu.step
+    state.getRegister(Registers.ID.B) should be (0x01)
+  }
+
+  "DCr" should "decrement the contents of register r" in {
+    val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x09)
+    val cpu = new CPU(ram)
+    val state = cpu.step
+    state.getRegister(Registers.ID.B) should be (-1) //TODO why did 0xFF not work?
+  }
+
   "LrI" should "load the index register with data B...B" in {
     val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x06).writeByte(0x0001, 0x42)
     val cpu = new CPU(ram)

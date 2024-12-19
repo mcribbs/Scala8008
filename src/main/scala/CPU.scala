@@ -32,8 +32,10 @@ class CPU(ram: Memory):
 
     val i: Instructions = new Instructions(t1)
     val t2: CPUState = (d7,d6,d5,d4,d3,d2,d1,d0) match {
-      case (0,0, 0,0,0, 0,0,0) => i.HLT
+      case (0,0, 0,0,0, 0,0,_) => i.HLT
       case (0,0, 1,1,1, 1,1,0) => i.LMI
+      case (0,0, _,_,_, 0,0,0) => i.INr(ddd)
+      case (0,0, _,_,_, 0,0,1) => i.DCr(ddd)
       case (0,0, _,_,_, 1,1,0) => i.LrI(ddd)
       case (0,0, _,_,_, _,_,_) => ???
       case (0,1, _,_,_, _,_,_) => ???
