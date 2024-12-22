@@ -33,57 +33,54 @@ class CPU(ram: Memory):
     val i: Instructions = new Instructions(t1)
     val t2: CPUState = (d7,d6,d5,d4,d3,d2,d1,d0) match {
       // CPU control group
-      case (0,0, 0,0,0, 0,0,_) => i.HLT           // HLT
-      case (1,1, 1,1,1, 1,1,1) => i.HLT           // HLT
+      case (0,0, 0,0,0, 0,0,_) => i.HLT                         // HLT
+      case (1,1, 1,1,1, 1,1,1) => i.HLT                         // HLT
 
       // Input and output group
-      case (0,1, 0,0,_, _,_,1) => ???             // INP
-      case (0,1, _,_,_, _,_,1) => ???             // OUT
+      case (0,1, 0,0,_, _,_,1) => ???                           // INP
+      case (0,1, _,_,_, _,_,1) => ???                           // OUT
 
       // Jump group
-      case (0,1, _,_,_, 1,0,0) => i.JMP           // JMP
-
-      case (0,1, 0,0,0, 0,0,0) => i.JFC           // JFC
-      case (0,1, 0,0,1, 0,0,0) => i.JFZ           // JFZ
-      case (0,1, 0,1,0, 0,0,0) => i.JFS           // JFS
-      case (0,1, 0,1,1, 0,0,0) => i.JFP           // JFP
-      case (0,1, 1,0,0, 0,0,0) => i.JC            // JC
-      case (0,1, 1,0,1, 0,0,0) => i.JZ            // JZ
-      case (0,1, 1,1,0, 0,0,0) => i.JS            // JS
-      case (0,1, 1,1,1, 0,0,0) => i.JP            // JP
+      case (0,1, _,_,_, 1,0,0) => i.JMP(true)                   // JMP
+      case (0,1, 0,0,0, 0,0,0) => i.JMP(!state.flags.carry)     // JFC
+      case (0,1, 0,0,1, 0,0,0) => i.JMP(!state.flags.zero)      // JFZ
+      case (0,1, 0,1,0, 0,0,0) => i.JMP(!state.flags.sign)      // JFS
+      case (0,1, 0,1,1, 0,0,0) => i.JMP(!state.flags.parity)    // JFP
+      case (0,1, 1,0,0, 0,0,0) => i.JMP(state.flags.carry)      // JC
+      case (0,1, 1,0,1, 0,0,0) => i.JMP(state.flags.zero)       // JZ
+      case (0,1, 1,1,0, 0,0,0) => i.JMP(state.flags.sign)       // JS
+      case (0,1, 1,1,1, 0,0,0) => i.JMP(state.flags.parity)     // JP
 
       // Call and return group
-      case (0,1, _,_,_, 1,1,0) => ???             // CAL
+      case (0,1, _,_,_, 1,1,0) => i.CAL(true)                   // CAL
+      case (0,1, 0,0,0, 0,1,0) => i.CAL(!state.flags.carry)     // CFC
+      case (0,1, 0,0,1, 0,1,0) => i.CAL(!state.flags.zero)      // CFZ
+      case (0,1, 0,1,0, 0,1,0) => i.CAL(!state.flags.sign)      // CFS
+      case (0,1, 0,1,1, 0,1,0) => i.CAL(!state.flags.parity)    // CFP
+      case (0,1, 1,0,0, 0,1,0) => i.CAL(state.flags.carry)      // CC
+      case (0,1, 1,0,1, 0,1,0) => i.CAL(state.flags.zero)       // CZ
+      case (0,1, 1,1,0, 0,1,0) => i.CAL(state.flags.sign)       // CS
+      case (0,1, 1,1,1, 0,1,0) => i.CAL(state.flags.parity)     // CP
 
-      case (0,1, 0,0,0, 0,1,0) => ???             // CFC
-      case (0,1, 0,0,1, 0,1,0) => ???             // CFZ
-      case (0,1, 0,1,0, 0,1,0) => ???             // CFS
-      case (0,1, 0,1,1, 0,1,0) => ???             // CFP
-      case (0,1, 1,0,0, 0,1,0) => ???             // CC
-      case (0,1, 1,0,1, 0,1,0) => ???             // CZ
-      case (0,1, 1,1,0, 0,1,0) => ???             // CS
-      case (0,1, 1,1,1, 0,1,0) => ???             // CP
-
-      case (0,0, _,_,_, 1,1,1) => ???             // RET
-
-      case (0,0, 0,0,0, 0,1,1) => ???             // RFC
-      case (0,0, 0,0,1, 0,1,1) => ???             // RFZ
-      case (0,0, 0,1,0, 0,1,1) => ???             // RFS
-      case (0,0, 0,1,1, 0,1,1) => ???             // RFP
-      case (0,0, 1,0,0, 0,1,1) => ???             // RC
-      case (0,0, 1,0,1, 0,1,1) => ???             // RZ
-      case (0,0, 1,1,0, 0,1,1) => ???             // RS
-      case (0,0, 1,1,1, 0,1,1) => ???             // RP
+      case (0,0, _,_,_, 1,1,1) => i.RET(true)                   // RET
+      case (0,0, 0,0,0, 0,1,1) => i.RET(!state.flags.carry)     // RFC
+      case (0,0, 0,0,1, 0,1,1) => i.RET(!state.flags.zero)      // RFZ
+      case (0,0, 0,1,0, 0,1,1) => i.RET(!state.flags.sign)      // RFS
+      case (0,0, 0,1,1, 0,1,1) => i.RET(!state.flags.parity)    // RFP
+      case (0,0, 1,0,0, 0,1,1) => i.RET(state.flags.carry)      // RC
+      case (0,0, 1,0,1, 0,1,1) => i.RET(state.flags.zero)       // RZ
+      case (0,0, 1,1,0, 0,1,1) => i.RET(state.flags.sign)       // RS
+      case (0,0, 1,1,1, 0,1,1) => i.RET(state.flags.parity)     // RP
 
       case (0,0, _,_,_, 1,0,1) => ???             // RST
 
       // Load group
-      case (1,1, _,_,_, 1,1,1) => i.LrM(ddd)      // LdM
-      case (1,1, 1,1,1, _,_,_) => i.LMr(sss)      // LMs
-      case (1,1, _,_,_, _,_,_) => i.Lrr(ddd, sss) // Lds
+      case (1,1, _,_,_, 1,1,1) => i.LrM(ddd)                    // LdM
+      case (1,1, 1,1,1, _,_,_) => i.LMr(sss)                    // LMs
+      case (1,1, _,_,_, _,_,_) => i.Lrr(ddd, sss)               // Lds
 
-      case (0,0, 1,1,1, 1,1,0) => i.LMI           // LMI
-      case (0,0, _,_,_, 1,1,0) => i.LrI(ddd)      // LdI
+      case (0,0, 1,1,1, 1,1,0) => i.LMI                         // LMI
+      case (0,0, _,_,_, 1,1,0) => i.LrI(ddd)                    // LdI
 
       // Arithmetic group
       case (1,0, 0,0,0, 1,1,1) => ???             // ADM

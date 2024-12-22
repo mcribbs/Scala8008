@@ -5,21 +5,26 @@ class Instructions(state: CPUState):
   def HLT: CPUState = 
     state.copy(halt = true)
 
-  def JMP: CPUState =
-    val low: Byte = state.ram.readByte(state.PC)
-    val state1 = state.incrementPC
-    val high: Byte = state1.ram.readByte(state1.PC)
-    state1.incrementPC
-    state.copy(stack = state.stack.withPC(((high << 8) + low).asInstanceOf[Short]))
+  def JMP(test: Boolean): CPUState =
+    if (test)
+      val address = state.ram.readAddress(state.PC)
+      state.copy(stack = state.stack.withPC(address))
+    else
+      state.incrementPC.incrementPC
 
-  def JFC: CPUState = if(!state.flags.carry) then JMP else state.incrementPC.incrementPC
-  def JFZ: CPUState = if(!state.flags.zero) then JMP else state.incrementPC.incrementPC
-  def JFS: CPUState = if(!state.flags.sign) then JMP else state.incrementPC.incrementPC
-  def JFP: CPUState = if(!state.flags.parity) then JMP else state.incrementPC.incrementPC
-  def JC: CPUState = if(state.flags.carry) then JMP else state.incrementPC.incrementPC
-  def JZ: CPUState = if(state.flags.zero) then JMP else state.incrementPC.incrementPC
-  def JS: CPUState = if(state.flags.sign) then JMP else state.incrementPC.incrementPC
-  def JP: CPUState = if(state.flags.parity) then JMP else state.incrementPC.incrementPC
+  def CAL(test: Boolean): CPUState =
+    if (test)
+      val address = state.ram.readAddress(state.PC)
+      val newState = state.incrementPC.incrementPC
+      newState.copy(stack = newState.stack.push(address))
+    else
+      state.incrementPC.incrementPC
+
+  def RET(test: Boolean): CPUState =
+    if (test)
+      state.decrementSP
+    else
+      state
 
   def LMI: CPUState =
     val data: Byte = state.ram.readByte(state.PC)

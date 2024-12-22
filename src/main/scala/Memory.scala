@@ -13,6 +13,7 @@ case class Memory(data: Array[Byte] = new Array[Byte](Memory.MAX_MEMORY)) {
     Memory(newData)
   }
   def readByte(address: Short): Byte = data(address)
+  def readAddress(address: Short): Short = ((data(address+1) << 8) + data(address)).toShort
 
   def logBytes(startAddress: Short, length: Int): Unit = {
     println(f"Memory dump - start address: $startAddress%#06x Bytes: $length")

@@ -16,7 +16,6 @@ case class CPUState (
   def getRegister(registerId: Byte): Byte = registers.getRegister(registerId)
   def writeByte(address: Short, value: Byte): CPUState = copy(ram = ram.writeByte(address, value))
 
-
   def logState(): Unit = {
     println(stack.toString)
     println(registers.toString)
