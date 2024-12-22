@@ -4,6 +4,7 @@ case class CPUState (
                       stack: Stack = Stack(), 
                       registers: Registers = Registers(), 
                       flags: Flags = Flags(),
+                      halt: Boolean = false,
                       ram: Memory 
                     )
 {

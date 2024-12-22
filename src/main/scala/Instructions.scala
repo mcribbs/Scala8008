@@ -3,14 +3,15 @@ package net.mcribbs.s8008
 class Instructions(state: CPUState):
 
   def HLT: CPUState = 
-    state.copy(flags = state.flags.copy(halt = true))
+    state.copy(halt = true)
 
   def LMI: CPUState =
     val data: Byte = state.ram.readByte(state.PC)
     state.incrementPC.writeByte(state.registers.HL, data)
-    
+
   def INr(dest: Byte): CPUState =
-    state.withRegister(dest, (state.getRegister(dest) + 1).toByte)
+    val value = (state.getRegister(dest) + 1).toByte
+    state.withRegister(dest, value).copy(flags = Flags.calcZSP(value))
 
   def DCr(dest: Byte): CPUState =
     state.withRegister(dest, (state.getRegister(dest) - 1).toByte)
