@@ -12,6 +12,12 @@ class StackTest extends AnyFlatSpec with should.Matchers {
     s.PC should be(0x01)
   }
 
+  it should "store a new value in PC" in {
+    var s = Stack()
+    s = s.withPC(((0x02 << 8) + 0x04).asInstanceOf[Short])
+    s.PC should be(0x0204)
+  }
+
   it should "store a value" in {
     var s = Stack()
     s = s.push(0xFF)
