@@ -26,6 +26,9 @@ class Instructions(state: CPUState):
     else
       state
 
+  def RST(aaa: Byte): CPUState =
+    state.copy(stack = state.stack.push((aaa << 3).toShort))
+
   def LMI: CPUState =
     val data: Byte = state.ram.readByte(state.PC)
     state.incrementPC.writeByte(state.registers.HL, data)

@@ -72,7 +72,7 @@ class CPU(ram: Memory):
       case (0,0, 1,1,0, 0,1,1) => i.RET(state.flags.sign)       // RS
       case (0,0, 1,1,1, 0,1,1) => i.RET(state.flags.parity)     // RP
 
-      case (0,0, _,_,_, 1,0,1) => ???             // RST
+      case (0,0, _,_,_, 1,0,1) => i.RST(ddd)                    // RST
 
       // Load group
       case (1,1, _,_,_, 1,1,1) => i.LrM(ddd)                    // LdM

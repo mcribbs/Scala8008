@@ -378,4 +378,14 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
       assert(state.PC == 0x0205)
     }
   }
+
+  "RST" should {
+    "Call the subroutine at memory address AAAOOO and move the SP up one level in the stack" in {
+      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x15)
+        .writeByte(0x0010, 0xFF.toByte)
+      val cpu = new CPU(ram)
+      cpu.state = cpu.step
+      assert(cpu.state.PC == 0x0010)
+    }
+  }
 }
