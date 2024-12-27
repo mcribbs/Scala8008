@@ -83,9 +83,9 @@ class CPU(ram: Memory):
       case (0,0, _,_,_, 1,1,0) => i.LrI(ddd)                    // LdI
 
       // Arithmetic group
-      case (1,0, 0,0,0, 1,1,1) => ???             // ADM
-      case (0,0, 0,0,0, 1,0,0) => ???             // ADI
-      case (1,0, 0,0,0, _,_,_) => ???             // ADs
+      case (1,0, 0,0,0, 1,1,1) => i.ADM                         // ADM
+      case (0,0, 0,0,0, 1,0,0) => i.ADI                         // ADI
+      case (1,0, 0,0,0, _,_,_) => i.ADr(sss)                    // ADs
 
       case (1,0, 0,0,1, 1,1,1) => ???             // ACM
       case (0,0, 0,0,1, 1,0,0) => ???             // ACI

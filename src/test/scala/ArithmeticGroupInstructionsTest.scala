@@ -5,6 +5,55 @@ import wordspec._
 
 class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
+  "ADM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x87.toByte)
+        .writeByte(0x0001, 0x05)
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte)
+        .withRegister(Registers.ID.H, 0x00).withRegister(Registers.ID.L, 0x01)
+      val state = cpu.step
+      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ADI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x04)
+        .writeByte(0x0001, 0x05)
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte)
+      val state = cpu.step
+      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ADr" should {
+    "Add the content of index register r to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x81.toByte)
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte).withRegister(Registers.ID.B, 0x05)
+      val state = cpu.step
+      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
   "INr" should {
     "increment the contents of register r and set ZSP" in {
       val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x08)
