@@ -106,6 +106,56 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
     }
   }
 
+  "SUM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x97))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      val test = cpu.state.toString
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFA))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "SUI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x14))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFA))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "SUr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x91))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF)).withRegister(Register.B, UByte(0x05))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFA))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
   "INr" should {
     "increment the contents of register r and set ZSP" in {
       val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x08))

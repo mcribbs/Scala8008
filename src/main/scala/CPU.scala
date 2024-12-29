@@ -94,9 +94,9 @@ class CPU(ram: Memory):
       case (0,0, 0,0,1, 1,0,0) => i.ACI                         // ACI
       case (1,0, 0,0,1, _,_,_) => i.ACr(sss)                    // ACs
 
-      case (1,0, 0,1,0, 1,1,1) => ???             // SUM
-      case (0,0, 0,1,0, 1,0,0) => ???             // SUI
-      case (1,0, 0,1,0, _,_,_) => ???             // SUs
+      case (1,0, 0,1,0, 1,1,1) => i.SUM                         // SUM
+      case (0,0, 0,1,0, 1,0,0) => i.SUI                         // SUI
+      case (1,0, 0,1,0, _,_,_) => i.SUr(sss)                    // SUs
 
       case (1,0, 0,1,1, 1,1,1) => ???             // SBM
       case (0,0, 0,1,1, 1,0,0) => ???             // SBI
