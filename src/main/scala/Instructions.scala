@@ -61,11 +61,20 @@ class Instructions(state: CPUState):
   def ADI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, add)
   def ADr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, add)
 
-  private def add(a: Byte, b: Byte): (Byte, Boolean) =
+  def ACM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, addWithCarry)
+  def ACI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, addWithCarry)
+  def ACr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, addWithCarry)
+
+
   private def add(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a + b
     val carry = (c < a) || (c < b)
-    (c.toByte, carry)
+    (c, carry)
+
+  private def addWithCarry(a: UByte, b: UByte): (UByte, Boolean) =
+    val c = a + b + UByte(state.flags.carry.compare(false))
+    val carry = (c < a) || (c < b)
+    (c, carry)
 
   private def doALU(mode: ADDRESSING_MODE, source: Register, f: (UByte, UByte) => (UByte, Boolean)): CPUState =
     val (data: UByte, s: CPUState) = mode match {

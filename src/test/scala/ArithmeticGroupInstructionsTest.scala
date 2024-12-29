@@ -41,6 +41,56 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
   }
 
   "ADr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x81))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF)).withRegister(Register.B, UByte(0x05))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x04))
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
+  "ACM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x8F))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x05))
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ACI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x04))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x04))
+      assert(state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ACr" should {
     "Add the content of index register r to the accumulator and properly set the flags" in {
       val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x81))
       val cpu = new CPU(ram)
