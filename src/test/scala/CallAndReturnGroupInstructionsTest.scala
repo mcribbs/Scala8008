@@ -2,13 +2,14 @@ package net.mcribbs.s8008
 
 import org.scalatest.*
 import org.scalatest.wordspec.*
+import spire.math.UByte
 
 class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CAL" should {
     "push the memory address B3...B3B2...B2 onto the stack" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       val state = cpu.step
       assert(state.PC == 0x0204)
@@ -17,8 +18,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CFC" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if C is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x42)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x42))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(carry = false))
       val state = cpu.step
@@ -26,8 +27,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if C is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x42)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x42))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(carry = true))
       val state = cpu.step
@@ -37,8 +38,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CFZ" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if Z is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x4A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x4A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(zero = false))
       val state = cpu.step
@@ -46,8 +47,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if Z is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x4A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x4A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(zero = true))
       val state = cpu.step
@@ -57,8 +58,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CFS" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if S is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x52)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x52))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(sign = false))
       val state = cpu.step
@@ -66,8 +67,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if S is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x52)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x52))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(sign = true))
       val state = cpu.step
@@ -77,8 +78,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CFP" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if P is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x5A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x5A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(parity = false))
       val state = cpu.step
@@ -86,8 +87,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if P is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x5A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x5A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(parity = true))
       val state = cpu.step
@@ -97,8 +98,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CC" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if C is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x62)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x62))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(carry = true))
       val state = cpu.step
@@ -106,8 +107,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if C is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x62)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x62))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(carry = false))
       val state = cpu.step
@@ -117,8 +118,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CZ" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if Z is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x6A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x6A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(zero = true))
       val state = cpu.step
@@ -126,8 +127,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if Z is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x6A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x6A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(zero = false))
       val state = cpu.step
@@ -137,8 +138,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CS" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if S is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x72)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x72))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(sign = true))
       val state = cpu.step
@@ -146,8 +147,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if S is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x72)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x72))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(sign = false))
       val state = cpu.step
@@ -157,8 +158,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "CP" should {
     "set the PC (unconditionally jump) to memory address B3...B3B2...B2 if P is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x7A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x7A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(parity = true))
       val state = cpu.step
@@ -166,8 +167,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if P is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x7A)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x7A))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02))
       val cpu = new CPU(ram)
       cpu.state = cpu.state.copy(flags = cpu.state.flags.copy(parity = false))
       val state = cpu.step
@@ -177,8 +178,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RET" should {
     "decrement the stack pointer, restoring the previous address" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x07)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x07))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -189,8 +190,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RFC" should {
     "decrement the stack pointer, restoring the previous address if C is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x03)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x03))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -200,8 +201,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if C is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x03)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x03))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -213,8 +214,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RFZ" should {
     "decrement the stack pointer, restoring the previous address if Z is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x0B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x0B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -224,8 +225,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if Z is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x0B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x0B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -237,8 +238,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RFS" should {
     "decrement the stack pointer, restoring the previous address if S is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x13)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x13))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -248,8 +249,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if S is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x13)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x13))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -261,8 +262,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RFP" should {
     "decrement the stack pointer, restoring the previous address if P is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x1B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x1B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -272,8 +273,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if S is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x1B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x1B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -285,8 +286,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RC" should {
     "decrement the stack pointer, restoring the previous address if C is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x23)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x23))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -296,8 +297,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if C is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x23)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x23))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -309,8 +310,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RZ" should {
     "decrement the stack pointer, restoring the previous address if Z is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x2B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x2B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -320,8 +321,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if Z is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x2B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x2B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -333,8 +334,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RS" should {
     "decrement the stack pointer, restoring the previous address if S is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x33)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x33))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -344,8 +345,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if S is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x33)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x33))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -357,8 +358,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RP" should {
     "decrement the stack pointer, restoring the previous address if P is true" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x3B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x3B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -368,8 +369,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
     }
 
     "but not if P is false" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x46)
-        .writeByte(0x0001, 0x04).writeByte(0x0002, 0x02).writeByte(0x0204, 0x3B)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x46))
+        .writeByte(0x0001, UByte(0x04)).writeByte(0x0002, UByte(0x02)).writeByte(0x0204, UByte(0x3B))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0204)
@@ -381,8 +382,8 @@ class CallAndReturnGroupInstructionsTest extends AnyWordSpec {
 
   "RST" should {
     "Call the subroutine at memory address AAAOOO and move the SP up one level in the stack" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x15)
-        .writeByte(0x0010, 0xFF.toByte)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x15))
+        .writeByte(0x0010, UByte(0xFF))
       val cpu = new CPU(ram)
       cpu.state = cpu.step
       assert(cpu.state.PC == 0x0010)

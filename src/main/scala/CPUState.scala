@@ -1,5 +1,7 @@
 package net.mcribbs.s8008
 
+import spire.math.UByte
+
 case class CPUState (
                       stack: Stack = Stack(), 
                       registers: Registers = Registers(), 
@@ -12,9 +14,10 @@ case class CPUState (
   def incrementPC: CPUState = copy(stack = stack.incPC)
   def pushToStack(address: Short): CPUState = copy(stack = stack.push(address))
   def decrementSP: CPUState = copy(stack = stack.decSP)
-  def withRegister(registerId: Byte, value: Byte): CPUState = copy(registers = registers.withRegister(registerId, value))
-  def getRegister(registerId: Byte): Byte = registers.getRegister(registerId)
-  def writeByte(address: Short, value: Byte): CPUState = copy(ram = ram.writeByte(address, value))
+  def withRegister(registerId: Register, value: UByte): CPUState = copy(registers = registers.withRegister(registerId, value))
+  def getRegister(registerId: Register): UByte = registers.getRegister(registerId)
+  def writeByte(address: Short, value: UByte): CPUState = copy(ram = ram.writeByte(address, value))
+  def withFlag(flagId: Flag, value: Boolean): CPUState = copy(flags = flags.withFlag(flagId, value))
 
   def logState(): Unit = {
     println(stack.toString)

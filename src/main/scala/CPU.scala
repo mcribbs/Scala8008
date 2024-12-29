@@ -1,5 +1,7 @@
 package net.mcribbs.s8008
 
+import spire.math.UByte
+
 class CPU(ram: Memory):
   var state: CPUState = CPUState(ram = ram)
 
@@ -15,23 +17,24 @@ class CPU(ram: Memory):
       We're going to use a similar concept to manage state
      */
 
-    val opcode: Byte = state.ram.readByte(state.PC)
+    val opcode: UByte = state.ram.readByte(state.PC)
     val t1 = state.incrementPC
 
     // Chunk opcode into useful parts
-    val d7 = (opcode & 0x80) >> 7
-    val d6 = (opcode & 0x40) >> 6
-    val d5 = (opcode & 0x20) >> 5
-    val d4 = (opcode & 0x10) >> 4
-    val d3 = (opcode & 0x08) >> 3
-    val d2 = (opcode & 0x04) >> 2
-    val d1 = (opcode & 0x02) >> 1
-    val d0 = (opcode & 0x01) >> 0 
-    val ddd: Byte = ((opcode & 0x38) >> 3).toByte
-    val sss: Byte = (opcode & 0x07).toByte
+    val d7 = (opcode & UByte(0x80)) >> 7
+    val d6 = (opcode & UByte(0x40)) >> 6
+    val d5 = (opcode & UByte(0x20)) >> 5
+    val d4 = (opcode & UByte(0x10)) >> 4
+    val d3 = (opcode & UByte(0x08)) >> 3
+    val d2 = (opcode & UByte(0x04)) >> 2
+    val d1 = (opcode & UByte(0x02)) >> 1
+    val d0 = (opcode & UByte(0x01)) >> 0
+    val aaa: UByte = (opcode & UByte(0x38)) >> 3
+    val ddd: Register = Registers.decodeRegister((opcode & UByte(0x38)) >> 3)
+    val sss: Register = Registers.decodeRegister(opcode & UByte(0x07))
 
     val i: Instructions = new Instructions(t1)
-    val t2: CPUState = (d7,d6,d5,d4,d3,d2,d1,d0) match {
+    val t2: CPUState = (d7.toInt,d6.toInt,d5.toInt,d4.toInt,d3.toInt,d2.toInt,d1.toInt,d0.toInt) match {
       // CPU control group
       case (0,0, 0,0,0, 0,0,_) => i.HLT                         // HLT
       case (1,1, 1,1,1, 1,1,1) => i.HLT                         // HLT
@@ -72,7 +75,7 @@ class CPU(ram: Memory):
       case (0,0, 1,1,0, 0,1,1) => i.RET(state.flags.sign)       // RS
       case (0,0, 1,1,1, 0,1,1) => i.RET(state.flags.parity)     // RP
 
-      case (0,0, _,_,_, 1,0,1) => i.RST(ddd)                    // RST
+      case (0,0, _,_,_, 1,0,1) => i.RST(aaa)                    // RST
 
       // Load group
       case (1,1, _,_,_, 1,1,1) => i.LrM(ddd)                    // LdM

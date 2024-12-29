@@ -1,19 +1,21 @@
 package net.mcribbs.s8008
 
-import org.scalatest._
-import wordspec._
+import org.scalatest.*
+import org.scalatest.wordspec.*
+import spire.math.UByte
 
 class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
   "ADM" should {
     "Add the content of memory register M to the accumulator and properly set the flags" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x87.toByte)
-        .writeByte(0x0001, 0x05)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x87))
+        .writeByte(0x0001, UByte(0x05))
       val cpu = new CPU(ram)
-      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte)
-        .withRegister(Registers.ID.H, 0x00).withRegister(Registers.ID.L, 0x01)
+      val test = cpu.state.toString
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
       val state = cpu.step
-      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.getRegister(Register.A) == UByte(0x04))
       assert(state.flags.carry)
       assert(!state.flags.zero)
       assert(!state.flags.sign)
@@ -24,12 +26,12 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
   "ADI" should {
     "Add the content of data B...B to the accumulator and properly set the flags" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x04)
-        .writeByte(0x0001, 0x05)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x04))
+        .writeByte(0x0001, UByte(0x05))
       val cpu = new CPU(ram)
-      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
       val state = cpu.step
-      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.getRegister(Register.A) == UByte(0x04))
       assert(state.flags.carry)
       assert(!state.flags.zero)
       assert(!state.flags.sign)
@@ -40,11 +42,11 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
   "ADr" should {
     "Add the content of index register r to the accumulator and properly set the flags" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x81.toByte)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x81))
       val cpu = new CPU(ram)
-      cpu.state = cpu.state.withRegister(Registers.ID.A, 0xFF.toByte).withRegister(Registers.ID.B, 0x05)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF)).withRegister(Register.B, UByte(0x05))
       val state = cpu.step
-      assert(state.getRegister(Registers.ID.A) == 0x04)
+      assert(state.getRegister(Register.A) == UByte(0x04))
       assert(state.flags.carry)
       assert(!state.flags.zero)
       assert(!state.flags.sign)
@@ -56,20 +58,20 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
   "INr" should {
     "increment the contents of register r and set ZSP" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x08)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x08))
       val cpu = new CPU(ram)
-      cpu.state = cpu.state.withRegister(Registers.ID.B, 0xFD.toByte)
+      cpu.state = cpu.state.withRegister(Register.B, UByte(0xFD))
       cpu.state = cpu.step
-      assert(cpu.state.getRegister(Registers.ID.B) == 0xFE.toByte)
-      val flags = Flags.calcZSP(cpu.state.getRegister(Registers.ID.B))
+      assert(cpu.state.getRegister(Register.B) == UByte(0xFE))
+      val flags = Flags.calcZSP(cpu.state.getRegister(Register.B))
       assert(!flags.zero)
       assert(flags.sign)
       assert(!flags.parity)
 
-      cpu.state = cpu.state.decrementSP.withRegister(Registers.ID.B, 0xFF.toByte)
+      cpu.state = cpu.state.decrementSP.withRegister(Register.B, UByte(0xFF))
       cpu.state = cpu.step
-      assert(cpu.state.getRegister(Registers.ID.B) == 0x00.toByte)
-      val flags2 = Flags.calcZSP(cpu.state.getRegister(Registers.ID.B))
+      assert(cpu.state.getRegister(Register.B) == UByte(0x00))
+      val flags2 = Flags.calcZSP(cpu.state.getRegister(Register.B))
       assert(flags2.zero)
       assert(!flags2.sign)
       assert(flags2.parity)
@@ -78,20 +80,20 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
 
   "DCr" should {
     "decrement the contents of register r" in {
-      val ram = Memory(new Array[Byte](Memory.MAX_MEMORY)).writeByte(0x0000, 0x09)
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x09))
       val cpu = new CPU(ram)
-      cpu.state = cpu.state.withRegister(Registers.ID.B, 0xFF.toByte)
+      cpu.state = cpu.state.withRegister(Register.B, UByte(0xFF))
       cpu.state = cpu.step
-      assert(cpu.state.getRegister(Registers.ID.B) == 0xFE.toByte)
-      val flags = Flags.calcZSP(cpu.state.getRegister(Registers.ID.B))
+      assert(cpu.state.getRegister(Register.B) == UByte(0xFE))
+      val flags = Flags.calcZSP(cpu.state.getRegister(Register.B))
       assert(!flags.zero)
       assert(flags.sign)
       assert(!flags.parity)
 
-      cpu.state = cpu.state.decrementSP.withRegister(Registers.ID.B, 0x01)
+      cpu.state = cpu.state.decrementSP.withRegister(Register.B, UByte(0x01))
       cpu.state = cpu.step
-      assert(cpu.state.getRegister(Registers.ID.B) == 0x00)
-      val flags2 = Flags.calcZSP(cpu.state.getRegister(Registers.ID.B))
+      assert(cpu.state.getRegister(Register.B) == UByte(0x00))
+      val flags2 = Flags.calcZSP(cpu.state.getRegister(Register.B))
       assert(flags2.zero)
       assert(!flags2.sign)
       assert(flags2.parity)

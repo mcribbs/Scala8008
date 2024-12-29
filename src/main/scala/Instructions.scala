@@ -1,5 +1,7 @@
 package net.mcribbs.s8008
 
+import spire.math.UByte
+
 class Instructions(state: CPUState):
 
   def HLT: CPUState = 
@@ -26,52 +28,53 @@ class Instructions(state: CPUState):
     else
       state
 
-  def RST(aaa: Byte): CPUState =
+  def RST(aaa: UByte): CPUState =
     state.copy(stack = state.stack.push((aaa << 3).toShort))
 
   def LMI: CPUState =
-    val data: Byte = state.ram.readByte(state.PC)
+    val data: UByte = state.ram.readByte(state.PC)
     state.incrementPC.writeByte(state.registers.HL, data)
 
-  def INr(dest: Byte): CPUState =
-    val value = (state.getRegister(dest) + 1).toByte
+  def INr(dest: Register): CPUState =
+    val value = state.getRegister(dest) + UByte(0x01)
     state.withRegister(dest, value).copy(flags = Flags.calcZSP(value))
 
-  def DCr(dest: Byte): CPUState =
-    state.withRegister(dest, (state.getRegister(dest) - 1).toByte)
+  def DCr(dest: Register): CPUState =
+    state.withRegister(dest, state.getRegister(dest) - UByte(0x01))
 
-  def LrI(dest: Byte): CPUState =
-    val data: Byte = state.ram.readByte(state.PC)
+  def LrI(dest: Register): CPUState =
+    val data: UByte = state.ram.readByte(state.PC)
     state.incrementPC.withRegister(dest, data)
 
-  def LMr(source: Byte): CPUState =
+  def LMr(source: Register): CPUState =
     val data = state.getRegister(source)
     state.writeByte(state.registers.HL, data)
 
-  def LrM(dest: Byte): CPUState =
-    val data: Byte = state.ram.readByte(state.registers.HL)
+  def LrM(dest: Register): CPUState =
+    val data: UByte = state.ram.readByte(state.registers.HL)
     state.incrementPC.withRegister(dest, data)
 
-  def Lrr(dest: Byte, source: Byte): CPUState =
+  def Lrr(dest: Register, source: Register): CPUState =
     state.withRegister(dest, state.getRegister(source))
 
-  def ADM: CPUState = doALU(ADDRESSING_MODE.M, 0, add)
-  def ADI: CPUState = doALU(ADDRESSING_MODE.I, 0, add)
-  def ADr(s: Byte): CPUState = doALU(ADDRESSING_MODE.R, s, add)
+  def ADM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, add)
+  def ADI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, add)
+  def ADr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, add)
 
   private def add(a: Byte, b: Byte): (Byte, Boolean) =
+  private def add(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a + b
     val carry = (c < a) || (c < b)
     (c.toByte, carry)
 
-  private def doALU(mode: ADDRESSING_MODE, source: Byte, f: (Byte, Byte) => (Byte, Boolean)): CPUState =
-    val (data:Byte, s: CPUState) = mode match {
+  private def doALU(mode: ADDRESSING_MODE, source: Register, f: (UByte, UByte) => (UByte, Boolean)): CPUState =
+    val (data: UByte, s: CPUState) = mode match {
       case ADDRESSING_MODE.M => (state.ram.readByte(state.registers.HL), state.incrementPC)
       case ADDRESSING_MODE.I => (state.ram.readByte(state.PC), state.incrementPC)
       case ADDRESSING_MODE.R => (state.getRegister(source), state)
     }
-    val (answer, carry) = f(s.getRegister(Registers.ID.A), data)
-    s.withRegister(Registers.ID.A, answer)
+    val (answer, carry) = f(s.getRegister(Register.A), data)
+    s.withRegister(Register.A, answer)
       .copy(flags = Flags.calcZSP(answer).copy(carry = carry))
 
 enum ADDRESSING_MODE:
