@@ -1,6 +1,6 @@
 package net.mcribbs.s8008
 
-import spire.math.UByte
+import spire.math.UByte 
 
 class Instructions(state: CPUState):
 
@@ -69,6 +69,21 @@ class Instructions(state: CPUState):
   def SUI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, subtract)
   def SUr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, subtract)
 
+  def SBM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, subtractWithBorrow)
+  def SBI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, subtractWithBorrow)
+  def SBr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, subtractWithBorrow)
+
+  def NDM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, (a, b) => (a & b, false))
+  def NDI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, (a, b) => (a & b, false))
+  def NDr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, (a, b) => (a & b, false))
+
+  def XRM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, (a, b) => (a ^ b, false))
+  def XRI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, (a, b) => (a ^ b, false))
+  def XRr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, (a, b) => (a ^ b, false))
+
+  def ORM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, (a, b) => (a | b, false))
+  def ORI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, (a, b) => (a | b, false))
+  def ORr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, (a, b) => (a | b, false))
 
   private def add(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a + b
@@ -82,6 +97,11 @@ class Instructions(state: CPUState):
 
   private def subtract(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a - b
+    val carry = (c > a) && (c > b)
+    (c, carry)
+
+  private def subtractWithBorrow(a: UByte, b: UByte): (UByte, Boolean) =
+    val c = a - b - UByte(state.flags.carry.compare(false))
     val carry = (c > a) && (c > b)
     (c, carry)
 

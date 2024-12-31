@@ -11,7 +11,6 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
       val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x87))
         .writeByte(0x0001, UByte(0x05))
       val cpu = new CPU(ram)
-      val test = cpu.state.toString
       cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
         .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
       val state = cpu.step
@@ -111,7 +110,6 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
       val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x97))
         .writeByte(0x0001, UByte(0x05))
       val cpu = new CPU(ram)
-      val test = cpu.state.toString
       cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
         .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
       val state = cpu.step
@@ -151,6 +149,211 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
       assert(!state.flags.zero)
       assert(state.flags.sign)
       assert(state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
+  "SBM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x9F))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xF9))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "SBI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x1C))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xF9))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "SBr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x99))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF)).withRegister(Register.B, UByte(0x05))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xF9))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
+  "NDM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xA7))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x0C))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "NDI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x24))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x0C))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "NDr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xA1))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C)).withRegister(Register.B, UByte(0x0D))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x0C))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
+  "XRM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xAF))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x31))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "XRI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x2C))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x31))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "XRr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xA9))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C)).withRegister(Register.B, UByte(0x0D))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x31))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
+  "ORM" should {
+    "Add the content of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xB7))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withRegister(Register.H, UByte(0x00)).withRegister(Register.L, UByte(0x01))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x3D))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ORI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x34))
+        .writeByte(0x0001, UByte(0x0D))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x3D))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "ORr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xB1))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0x3C)).withRegister(Register.B, UByte(0x0D))
+        .withFlag(Flag.C, true)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0x3D))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(!state.flags.sign)
+      assert(!state.flags.parity)
       // TODO more flag tests
 
     }
