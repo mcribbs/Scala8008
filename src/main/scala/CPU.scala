@@ -2,6 +2,11 @@ package net.mcribbs.s8008
 
 import spire.math.UByte
 
+import scala.language.implicitConversions
+
+implicit def int2UByte(i: Int): UByte = UByte(i)
+implicit def uByte2Int(i: UByte): Int = i.toInt
+
 class CPU(ram: Memory):
   var state: CPUState = CPUState(ram = ram)
 
@@ -21,20 +26,20 @@ class CPU(ram: Memory):
     val t1 = state.incrementPC
 
     // Chunk opcode into useful parts
-    val d7 = (opcode & UByte(0x80)) >> 7
-    val d6 = (opcode & UByte(0x40)) >> 6
-    val d5 = (opcode & UByte(0x20)) >> 5
-    val d4 = (opcode & UByte(0x10)) >> 4
-    val d3 = (opcode & UByte(0x08)) >> 3
-    val d2 = (opcode & UByte(0x04)) >> 2
-    val d1 = (opcode & UByte(0x02)) >> 1
-    val d0 = (opcode & UByte(0x01)) >> 0
-    val aaa: UByte = (opcode & UByte(0x38)) >> 3
-    val ddd: Register = Registers.decodeRegister((opcode & UByte(0x38)) >> 3)
-    val sss: Register = Registers.decodeRegister(opcode & UByte(0x07))
+    val d7: Int = (opcode & 0x80) >> 7
+    val d6: Int = (opcode & 0x40) >> 6
+    val d5: Int = (opcode & 0x20) >> 5
+    val d4: Int = (opcode & 0x10) >> 4
+    val d3: Int = (opcode & 0x08) >> 3
+    val d2: Int = (opcode & 0x04) >> 2
+    val d1: Int = (opcode & 0x02) >> 1
+    val d0: Int = (opcode & 0x01) >> 0
+    val aaa: UByte = (opcode & 0x38) >> 3
+    val ddd: Register = Registers.decodeRegister((opcode & 0x38) >> 3)
+    val sss: Register = Registers.decodeRegister(opcode & 0x07)
 
     val i: Instructions = new Instructions(t1)
-    val t2: CPUState = (d7.toInt,d6.toInt,d5.toInt,d4.toInt,d3.toInt,d2.toInt,d1.toInt,d0.toInt) match {
+    val t2: CPUState = (d7,d6,d5,d4,d3,d2,d1,d0) match {
       // CPU control group
       case (0,0, 0,0,0, 0,0,_) => i.HLT                         // HLT
       case (1,1, 1,1,1, 1,1,1) => i.HLT                         // HLT
@@ -114,9 +119,9 @@ class CPU(ram: Memory):
       case (0,0, 1,1,0, 1,0,0) => i.ORI                         // ORI
       case (1,0, 1,1,0, _,_,_) => i.ORr(sss)                    // ORs
 
-      case (1,0, 1,1,1, 1,1,1) => ???                           // CPM
-      case (0,0, 1,1,1, 1,0,0) => ???                           // CPI
-      case (1,0, 1,1,1, _,_,_) => ???                           // CPs
+      case (1,0, 1,1,1, 1,1,1) => i.CPM                         // CPM
+      case (0,0, 1,1,1, 1,0,0) => i.CPI                         // CPI
+      case (1,0, 1,1,1, _,_,_) => i.CPr(sss)                    // CPs
 
       case (0,0, _,_,_, 0,0,0) => i.INr(ddd)                    // INd
       case (0,0, _,_,_, 0,0,1) => i.DCr(ddd)                    // DCd

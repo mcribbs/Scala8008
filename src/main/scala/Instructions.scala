@@ -36,11 +36,11 @@ class Instructions(state: CPUState):
     state.incrementPC.writeByte(state.registers.HL, data)
 
   def INr(dest: Register): CPUState =
-    val value = state.getRegister(dest) + UByte(0x01)
+    val value = state.getRegister(dest) + 0x01
     state.withRegister(dest, value).copy(flags = Flags.calcZSP(value))
 
   def DCr(dest: Register): CPUState =
-    state.withRegister(dest, state.getRegister(dest) - UByte(0x01))
+    state.withRegister(dest, state.getRegister(dest) - 0x01)
 
   def LrI(dest: Register): CPUState =
     val data: UByte = state.ram.readByte(state.PC)
@@ -85,6 +85,10 @@ class Instructions(state: CPUState):
   def ORI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, (a, b) => (a | b, false))
   def ORr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, (a, b) => (a | b, false))
 
+  def CPM: CPUState = doALU(ADDRESSING_MODE.M, Register.A, compare)
+  def CPI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, compare)
+  def CPr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, compare)
+
   private def add(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a + b
     val carry = (c < a) || (c < b)
@@ -104,6 +108,11 @@ class Instructions(state: CPUState):
     val c = a - b - UByte(state.flags.carry.compare(false))
     val carry = (c > a) && (c > b)
     (c, carry)
+
+  private def compare(a: UByte, b: UByte): (UByte, Boolean) =
+    val c = a - b
+    val carry = (c > a) && (c > b)
+    (a, carry)
 
   private def doALU(mode: ADDRESSING_MODE, source: Register, f: (UByte, UByte) => (UByte, Boolean)): CPUState =
     val (data: UByte, s: CPUState) = mode match {

@@ -359,6 +359,55 @@ class ArithmeticGroupInstructionsTest extends AnyWordSpec {
     }
   }
 
+  "CPM" should {
+    "Compare the contents of memory register M to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, 0xBF)
+        .writeByte(0x0001, 0x05)
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, 0xFF)
+        .withRegister(Register.H, 0x00).withRegister(Register.L, 0x01)
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFF))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "CPI" should {
+    "Add the content of data B...B to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x3C))
+        .writeByte(0x0001, UByte(0x05))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFF))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+    }
+  }
+
+  "CPr" should {
+    "Add the content of index register r and carry flag to the accumulator and properly set the flags" in {
+      val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0xB9))
+      val cpu = new CPU(ram)
+      cpu.state = cpu.state.withRegister(Register.A, UByte(0xFF)).withRegister(Register.B, UByte(0x05))
+      val state = cpu.step
+      assert(state.getRegister(Register.A) == UByte(0xFF))
+      assert(!state.flags.carry)
+      assert(!state.flags.zero)
+      assert(state.flags.sign)
+      assert(state.flags.parity)
+      // TODO more flag tests
+
+    }
+  }
+
   "INr" should {
     "increment the contents of register r and set ZSP" in {
       val ram = Memory(new Array[UByte](Memory.MAX_MEMORY)).writeByte(0x0000, UByte(0x08))
