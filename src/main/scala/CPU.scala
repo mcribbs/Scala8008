@@ -127,10 +127,10 @@ class CPU(ram: Memory):
       case (0,0, _,_,_, 0,0,1) => i.DCr(ddd)                    // DCd
 
       // Rotate group
-      case (0,0, 0,0,0, 0,1,0) => ???                           // RLC
-      case (0,0, 0,0,1, 0,1,0) => ???                           // RRC
-      case (0,0, 0,1,0, 0,1,0) => ???                           // RAL
-      case (0,0, 0,1,1, 0,1,0) => ???                           // RAR
+      case (0,0, 0,0,0, 0,1,0) => i.RLC                         // RLC
+      case (0,0, 0,0,1, 0,1,0) => i.RRC                         // RRC
+      case (0,0, 0,1,0, 0,1,0) => i.RAL                         // RAL
+      case (0,0, 0,1,1, 0,1,0) => i.RAR                         // RAR
     }
     t2
   }

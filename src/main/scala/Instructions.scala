@@ -89,6 +89,26 @@ class Instructions(state: CPUState):
   def CPI: CPUState = doALU(ADDRESSING_MODE.I, Register.A, compare)
   def CPr(s: Register): CPUState = doALU(ADDRESSING_MODE.R, s, compare)
 
+  def RLC: CPUState =
+    val shifted = state.getRegister(Register.A).toInt << 1
+    val c = shifted > 255
+    state.withRegister(Register.A, shifted | c.compare(false)).copy(flags = state.flags.withFlag(Flag.C, c))
+
+  def RRC: CPUState =
+    val c = state.getRegister(Register.A) & 0x01
+    val shifted = state.getRegister(Register.A).toInt >>> 1
+    state.withRegister(Register.A, shifted | c << 7).copy(flags = state.flags.withFlag(Flag.C, c.toInt != 0))
+
+  def RAL: CPUState =
+    val shifted = state.getRegister(Register.A).toInt << 1
+    val c = shifted > 255
+    state.withRegister(Register.A, shifted | state.flags.carry.compare(false)).copy(flags = state.flags.withFlag(Flag.C, c))
+
+  def RAR: CPUState =
+    val c = state.getRegister(Register.A) & 0x01
+    val shifted = state.getRegister(Register.A).toInt >>> 1
+    state.withRegister(Register.A, shifted | state.flags.carry.compare(false) << 7).copy(flags = state.flags.withFlag(Flag.C, c.toInt != 0))
+    
   private def add(a: UByte, b: UByte): (UByte, Boolean) =
     val c = a + b
     val carry = (c < a) || (c < b)
