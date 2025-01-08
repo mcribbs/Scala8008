@@ -1,30 +1,23 @@
 package net.mcribbs.s8008
 
 // https://retrocomputing.stackexchange.com/questions/15787/intel-8008-stack-behavior
-class Stack (sp: Int = 0, s: Array[Short] = Array.ofDim[Short](Stack.MAX_SIZE)):
+case class Stack (sp: Int = 0, s: Vector[Short] = Vector.fill[Short](Stack.MAX_SIZE)(0x0000)):
 
-  def push(address: Short): Stack = 
+  def push(address: Short): Stack =
     val newStackPointer = (this.sp + 1) % Stack.MAX_SIZE
-    // Again, pretending to be immutable with the mutable Array... Ok????
-    val newStackBuffer = this.s.clone()
-    newStackBuffer(newStackPointer) = address
-    new Stack(newStackPointer, newStackBuffer)
+    Stack(newStackPointer, this.s.updated(newStackPointer, address))
 
   def decSP: Stack = 
     val newStackPointer = (sp + Stack.MAX_SIZE - 1) % Stack.MAX_SIZE
-    new Stack(newStackPointer, this.s)
+    Stack(newStackPointer, this.s)
 
   def PC: Short = s(sp)
   
   def withPC(newPC: Short): Stack =
-    val newStackBuffer = this.s.clone()
-    newStackBuffer(sp) = newPC 
-    new Stack(sp, newStackBuffer)
+    Stack(sp, this.s.updated(sp, newPC))
   
   def incPC: Stack =
-    val newStackBuffer = this.s.clone()
-    newStackBuffer(sp) = (s(sp) + 1).toShort
-    new Stack(sp, newStackBuffer)
+    Stack(sp, this.s.updated(sp, (s(sp) + 1).toShort))
 
   override def toString:String = 
     f"PC:$PC%#06x " +
@@ -32,4 +25,4 @@ class Stack (sp: Int = 0, s: Array[Short] = Array.ofDim[Short](Stack.MAX_SIZE)):
     f"sp:$sp%#04x "
 
 object Stack:
-  val MAX_SIZE = 8
+  private val MAX_SIZE = 8
